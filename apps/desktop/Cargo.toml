@@ -9,4 +9,10 @@ publish = false
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+anyhow = "1.0.104"
+futures = "0.3.34"
+livekit = "0.10.1"
+livekit-capture = { version = "0.1.9", features = ["source-pattern"] }
+livekit-token = "0.4.0"
 tauri = { version = "2", features = [] }
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "signal"] }
