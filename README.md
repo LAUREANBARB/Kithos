@@ -2,7 +2,8 @@
 
 Private voice, video and text for a small friend group.
 
-Kithos is a self-hosted alternative to Discord, built for roughly 5-15 people.
+Kithos is a self-hosted chat, voice and screen-sharing application built for a
+close group of people, roughly 5-15.
 It targets the four things the existing options each get partly wrong: voice
 that sounds fine, screen sharing that holds 1080p60, chat with durable
 searchable history, and a client whose theme, fonts, avatars and banners you
@@ -13,11 +14,11 @@ privately and is not part of this repository.
 
 ## Why
 
-Discord is a 400-800 MB Electron client that collects far more data than a
-group chat needs, and it has leaked that data more than once. The open
-alternatives solve chat well and media badly, and the lightweight ones give up
-theming entirely. Kithos is deliberately narrow: one small server, one native
-client, no telemetry, no third party holding the messages.
+Big chat platforms are heavy Electron clients that collect more data than a
+group chat needs. The open alternatives solve chat well and media badly, and
+the lightweight ones give up theming entirely. Kithos is deliberately narrow:
+one small server, one native client, no telemetry, no third party holding the
+messages.
 
 ## Shape
 
