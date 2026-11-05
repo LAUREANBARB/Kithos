@@ -1,8 +1,3 @@
-//! P0 spike: publish a 1920x1080@60 synthetic track to a local LiveKit server
-//! and measure what a second participant actually receives.
-//!
-//! Run a server first: `livekit-server --dev`
-//! Then: `cargo run --example livekit_spike`
 
 use std::time::{Duration, Instant};
 

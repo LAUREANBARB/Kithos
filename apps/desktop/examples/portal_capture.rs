@@ -1,11 +1,3 @@
-//! P0 spike, step 2: capture a real monitor through the desktop portal and
-//! publish it to a local LiveKit server at 1920x1080.
-//!
-//! Run a server first: `livekit-server --dev`
-//! Then: `cargo run --example portal_capture`
-//!
-//! The first run opens the system monitor picker. Choose a screen; the choice
-//! is remembered by the portal for later runs.
 
 use std::time::{Duration, Instant};
 
@@ -48,10 +40,7 @@ fn token(identity: &str) -> Result<String> {
         .context("signing the access token")
 }
 
-/// Pulls I420 frames from a `pipewiresrc` pipeline fed by the portal.
 struct PortalScreen {
-    // The portal session and its fd must outlive the stream they authorised:
-    // the node id is only valid inside that PipeWire remote.
     _session: ashpd::desktop::Session<Screencast>,
     _remote: std::os::fd::OwnedFd,
     pipeline: gst::Pipeline,
@@ -95,8 +84,6 @@ impl PortalScreen {
         let (width, height) = stream.size().unwrap_or((1920, 1080));
         println!("portal granted node {node_id} at {width}x{height}");
 
-        // Keep the fd open for the lifetime of the pipeline: pipewiresrc
-        // connects to the session-scoped remote, not the default daemon.
         let remote = screencast
             .open_pipe_wire_remote(&session, OpenPipeWireRemoteOptions::default())
             .await
@@ -206,8 +193,6 @@ impl PixelVideoSource for PortalScreen {
             let (stride_y, stride_u, stride_v) = i420.strides();
             let (dst_y, dst_u, dst_v) = i420.data_mut();
 
-            // Offsets and strides come from the negotiated caps: PipeWire can
-            // hand back padded rows, so a tight copy would shear the image.
             let copy_plane = |plane: usize, dst: &mut [u8], dst_stride: u32| {
                 let src_stride = frame_info.stride()[plane] as usize;
                 let rows = frame_info.height() as usize / if plane == 0 { 1 } else { 2 };
