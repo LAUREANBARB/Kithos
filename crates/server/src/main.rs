@@ -13,6 +13,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(&address).await?;
 
     tracing::info!("listening on {address}");
-    axum::serve(listener, app(AppState { pool })).await?;
+    axum::serve(listener, app(AppState::new(pool))).await?;
     Ok(())
 }

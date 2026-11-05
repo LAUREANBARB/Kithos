@@ -1,37 +1,25 @@
-use axum::body::Body;
+mod common;
+
 use axum::http::{Request, StatusCode};
-use http_body_util::BodyExt;
-use kithos_server::{app, init_memory_db, AppState};
+use common::{call, register, setup, PROTOCOL};
+use axum::body::Body;
 use tower::ServiceExt;
-
-async fn router() -> axum::Router {
-    let pool = init_memory_db().await.expect("in-memory database");
-    app(AppState { pool })
-}
-
-async fn register(router: &axum::Router, username: &str, password: &str) -> (StatusCode, serde_json::Value) {
-    let body = serde_json::json!({
-        "username": username,
-        "display_name": "Test User",
-        "password": password
-    });
-    let request = Request::builder()
-        .method("POST")
-        .uri("/auth/register")
-        .header("content-type", "application/json")
-        .body(Body::from(body.to_string()))
-        .unwrap();
-    let response = router.clone().oneshot(request).await.unwrap();
-    let status = response.status();
-    let bytes = response.into_body().collect().await.unwrap().to_bytes();
-    let json = serde_json::from_slice(&bytes).unwrap_or(serde_json::Value::Null);
-    (status, json)
-}
 
 #[tokio::test]
 async fn register_returns_a_token_and_user() {
-    let app = router().await;
-    let (status, body) = register(&app, "Dvrkxn", "correct horse battery").await;
+    let (app, _) = setup().await;
+    let (status, body) = call(
+        &app,
+        "POST",
+        "/auth/register",
+        None,
+        Some(serde_json::json!({
+            "username": "Dvrkxn",
+            "display_name": "Test User",
+            "password": "correct horse battery"
+        })),
+    )
+    .await;
 
     assert_eq!(status, StatusCode::OK);
     assert!(body["token"].as_str().is_some_and(|t| t.len() >= 32));
@@ -41,19 +29,41 @@ async fn register_returns_a_token_and_user() {
 
 #[tokio::test]
 async fn register_rejects_duplicate_usernames_case_insensitively() {
-    let app = router().await;
-    let (first, _) = register(&app, "dvrkxn", "correct horse battery").await;
-    let (second, body) = register(&app, "DVRKXN", "another good password").await;
+    let (app, _) = setup().await;
+    register(&app, "dvrkxn", "correct horse battery").await;
 
-    assert_eq!(first, StatusCode::OK);
-    assert_eq!(second, StatusCode::CONFLICT);
+    let (status, body) = call(
+        &app,
+        "POST",
+        "/auth/register",
+        None,
+        Some(serde_json::json!({
+            "username": "DVRKXN",
+            "display_name": "Second",
+            "password": "another good password"
+        })),
+    )
+    .await;
+
+    assert_eq!(status, StatusCode::CONFLICT);
     assert_eq!(body["error"], "username taken");
 }
 
 #[tokio::test]
 async fn register_rejects_short_passwords() {
-    let app = router().await;
-    let (status, body) = register(&app, "someone", "short").await;
+    let (app, _) = setup().await;
+    let (status, body) = call(
+        &app,
+        "POST",
+        "/auth/register",
+        None,
+        Some(serde_json::json!({
+            "username": "someone",
+            "display_name": "Someone",
+            "password": "short"
+        })),
+    )
+    .await;
 
     assert_eq!(status, StatusCode::BAD_REQUEST);
     assert_eq!(body["error"], "password too short");
@@ -61,52 +71,72 @@ async fn register_rejects_short_passwords() {
 
 #[tokio::test]
 async fn login_rejects_a_wrong_password() {
-    let app = router().await;
+    let (app, _) = setup().await;
     register(&app, "dvrkxn", "correct horse battery").await;
 
-    let body = serde_json::json!({ "username": "dvrkxn", "password": "wrong horse battery" });
-    let request = Request::builder()
-        .method("POST")
-        .uri("/auth/login")
-        .header("content-type", "application/json")
-        .body(Body::from(body.to_string()))
-        .unwrap();
-    let response = app.oneshot(request).await.unwrap();
+    let (status, _) = call(
+        &app,
+        "POST",
+        "/auth/login",
+        None,
+        Some(serde_json::json!({ "username": "dvrkxn", "password": "wrong horse battery" })),
+    )
+    .await;
 
-    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    assert_eq!(status, StatusCode::UNAUTHORIZED);
 }
 
 #[tokio::test]
 async fn me_rejects_missing_and_invalid_tokens() {
-    let app = router().await;
+    let (app, _) = setup().await;
 
-    let missing = Request::builder().uri("/me").body(Body::empty()).unwrap();
-    assert_eq!(app.clone().oneshot(missing).await.unwrap().status(), StatusCode::UNAUTHORIZED);
+    let (missing, _) = call(&app, "GET", "/me", None, None).await;
+    assert_eq!(missing, StatusCode::UNAUTHORIZED);
 
-    let invalid = Request::builder()
-        .uri("/me")
-        .header("authorization", "Bearer not-a-real-token")
-        .body(Body::empty())
-        .unwrap();
-    assert_eq!(app.oneshot(invalid).await.unwrap().status(), StatusCode::UNAUTHORIZED);
+    let (invalid, _) = call(&app, "GET", "/me", Some("not-a-real-token"), None).await;
+    assert_eq!(invalid, StatusCode::UNAUTHORIZED);
 }
 
 #[tokio::test]
 async fn me_returns_the_authenticated_user() {
-    let app = router().await;
-    let (_, body) = register(&app, "dvrkxn", "correct horse battery").await;
-    let token = body["token"].as_str().expect("token").to_string();
+    let (app, _) = setup().await;
+    let (token, _) = register(&app, "dvrkxn", "correct horse battery").await;
+
+    let (status, user) = call(&app, "GET", "/me", Some(&token), None).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(user["username"], "dvrkxn");
+    assert_eq!(user["bio"], "");
+}
+
+#[tokio::test]
+async fn requests_without_a_protocol_version_are_refused() {
+    let (app, _) = setup().await;
 
     let request = Request::builder()
         .uri("/me")
-        .header("authorization", format!("Bearer {token}"))
         .body(Body::empty())
         .unwrap();
     let response = app.oneshot(request).await.unwrap();
 
-    assert_eq!(response.status(), StatusCode::OK);
-    let bytes = response.into_body().collect().await.unwrap().to_bytes();
-    let user: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
-    assert_eq!(user["username"], "dvrkxn");
-    assert_eq!(user["bio"], "");
+    assert_eq!(response.status(), StatusCode::UPGRADE_REQUIRED);
+}
+
+#[tokio::test]
+async fn an_old_protocol_version_is_refused_with_the_current_one_named() {
+    let (app, _) = setup().await;
+
+    let request = Request::builder()
+        .uri("/me")
+        .header("x-kithos-protocol", "0")
+        .body(Body::empty())
+        .unwrap();
+    let response = app.oneshot(request).await.unwrap();
+
+    assert_eq!(response.status(), StatusCode::UPGRADE_REQUIRED);
+    let body = http_body_util::BodyExt::collect(response.into_body())
+        .await
+        .unwrap()
+        .to_bytes();
+    let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert!(json["error"].as_str().unwrap().contains(PROTOCOL));
 }
