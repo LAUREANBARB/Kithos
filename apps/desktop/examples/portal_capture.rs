@@ -50,11 +50,16 @@ fn token(identity: &str) -> Result<String> {
 
 /// Pulls I420 frames from a `pipewiresrc` pipeline fed by the portal.
 struct PortalScreen {
-    // The portal session must outlive the stream it authorised.
+    // The portal session and its fd must outlive the stream they authorised:
+    // the node id is only valid inside that PipeWire remote.
     _session: ashpd::desktop::Session<Screencast>,
+    _remote: std::os::fd::OwnedFd,
     pipeline: gst::Pipeline,
     sink: AppSink,
+    bus: gst::Bus,
     resolution: VideoResolution,
+    captured: u64,
+    reported_error: bool,
 }
 
 impl PortalScreen {
@@ -92,34 +97,55 @@ impl PortalScreen {
 
         // Keep the fd open for the lifetime of the pipeline: pipewiresrc
         // connects to the session-scoped remote, not the default daemon.
-        let _fd = screencast
+        let remote = screencast
             .open_pipe_wire_remote(&session, OpenPipeWireRemoteOptions::default())
             .await
             .context("opening the PipeWire remote")?;
 
-        let description = format!(
-            "pipewiresrc path={node_id} ! videoconvert ! video/x-raw,format=I420 \
-             ! appsink name=lk_appsink sync=false max-buffers=2 drop=true"
-        );
-        let pipeline = gst::parse::launch(&description)
-            .context("building the capture pipeline")?
-            .downcast::<gst::Pipeline>()
-            .map_err(|_| anyhow::anyhow!("launch description did not produce a pipeline"))?;
-        let sink = pipeline
-            .by_name("lk_appsink")
-            .context("pipeline has no lk_appsink")?
-            .downcast::<AppSink>()
-            .map_err(|_| anyhow::anyhow!("lk_appsink is not an appsink"))?;
+        let src = gst::ElementFactory::make("pipewiresrc")
+            .property("fd", std::os::fd::AsRawFd::as_raw_fd(&remote))
+            .property("path", node_id.to_string())
+            .build()
+            .context("creating pipewiresrc")?;
+        let convert = gst::ElementFactory::make("videoconvert")
+            .build()
+            .context("creating videoconvert")?;
+        let caps = gst::Caps::builder("video/x-raw")
+            .field("format", "I420")
+            .build();
+        let capsfilter = gst::ElementFactory::make("capsfilter")
+            .property("caps", &caps)
+            .build()
+            .context("creating capsfilter")?;
+        let sink = gstreamer_app::AppSink::builder()
+            .sync(false)
+            .max_buffers(2)
+            .drop(true)
+            .build();
+        let sink_element = sink.clone().upcast::<gst::Element>();
+
+        let pipeline = gst::Pipeline::new();
+        pipeline
+            .add_many([&src, &convert, &capsfilter, &sink_element])
+            .context("assembling the pipeline")?;
+        gst::Element::link_many([&src, &convert, &capsfilter, &sink_element])
+            .context("linking the capture pipeline")?;
 
         pipeline
             .set_state(gst::State::Playing)
             .context("starting the capture pipeline")?;
 
+        let bus = pipeline.bus().context("pipeline has no bus")?;
+
         Ok(Self {
             _session: session,
+            _remote: remote,
             pipeline,
             sink,
+            bus,
             resolution: VideoResolution { width: width as u32, height: height as u32 },
+            captured: 0,
+            reported_error: false,
         })
     }
 }
@@ -132,6 +158,34 @@ impl PixelVideoSource for PortalScreen {
     fn next_frame(&mut self, stop: &PumpStop) -> Result<Option<BoxVideoFrame>, SourceError> {
         while !stop.is_stopped() {
             let Some(sample) = self.sink.try_pull_sample(gst::ClockTime::from_mseconds(100)) else {
+                if !self.reported_error {
+                    while let Some(msg) = self.bus.pop() {
+                        use gst::MessageView;
+                        match msg.view() {
+                            MessageView::Error(err) => {
+                                eprintln!(
+                                    "pipeline error from {:?}: {} ({:?})",
+                                    err.src().map(|s| s.name()),
+                                    err.error(),
+                                    err.debug()
+                                );
+                                self.reported_error = true;
+                            }
+                            MessageView::StateChanged(state) => {
+                                if let Some(el) = state.src() {
+                                    if el.name() == "pipeline0" {
+                                        eprintln!(
+                                            "pipeline state: {:?} -> {:?}",
+                                            state.old(),
+                                            state.current()
+                                        );
+                                    }
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                }
                 continue;
             };
             let Some(buffer) = sample.buffer() else {
@@ -173,6 +227,11 @@ impl PixelVideoSource for PortalScreen {
             copy_plane(1, dst_u, stride_u);
             copy_plane(2, dst_v, stride_v);
 
+            self.captured += 1;
+            if self.captured % 60 == 0 {
+                println!("captured {} frames from the portal", self.captured);
+            }
+
             return Ok(Some(VideoFrame {
                 rotation: VideoRotation::VideoRotation0,
                 timestamp_us: 0,
@@ -207,8 +266,14 @@ async fn main() -> Result<()> {
             TrackPublishOptions {
                 source: TrackSource::Screenshare,
                 video_codec: VideoCodec::H264,
-                simulcast: true,
+                simulcast: std::env::var("KITHOS_SPIKE_SIMULCAST").is_err(),
                 video_encoding: Some(VideoEncoding { max_bitrate: 6_000_000, max_framerate: 60.0 }),
+                video_encoder: match std::env::var("KITHOS_SPIKE_ENCODER").as_deref() {
+                    Ok("vaapi") => livekit::options::VideoEncoderBackend::Vaapi,
+                    Ok("hardware") => livekit::options::VideoEncoderBackend::Hardware,
+                    Ok("software") => livekit::options::VideoEncoderBackend::Software,
+                    _ => livekit::options::VideoEncoderBackend::Auto,
+                },
                 ..Default::default()
             },
         )
