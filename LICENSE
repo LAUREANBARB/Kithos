@@ -1,0 +1,148 @@
+# Kithos Personal Use License (KPUL) v1.0
+
+Copyright (c) 2026 DVRKXN
+
+All rights reserved.
+
+Kithos is distributed under a source-available, proprietary license. It is not an open-source license approved by the Open Source Initiative (OSI).
+
+By accessing, downloading, installing, modifying, compiling, or using Kithos, you agree to the terms of this License. If you do not agree, you may not use Kithos under the permissions granted below.
+
+## 1. Definitions
+
+For this License:
+
+- **Kithos** means the original software project, including its source code, compiled binaries, application components, documentation, and other materials owned by the Copyright Holder and distributed as part of the project.
+- **Copyright Holder** means DVRKXN, the owner of the copyright in the original Kithos materials covered by this License.
+- **Private Group** means a limited, invite-only group of individuals using Kithos for personal, non-commercial communication.
+- **Commercial Use** means using, distributing, hosting, modifying, or incorporating Kithos for a commercial purpose or to generate revenue, directly or indirectly.
+- **Modified Version** means a version of Kithos that has been changed, adapted, extended, or built upon.
+
+## 2. Permission Grant
+
+Subject to compliance with this License, the Copyright Holder grants you a limited, non-exclusive, non-transferable, non-sublicensable permission to:
+
+1. View, inspect, and study the Kithos source code.
+2. Download the original source code from the official Kithos repository.
+3. Modify the source code for personal, private, non-commercial use.
+4. Compile and build original or modified versions for personal, private use.
+5. Run and self-host Kithos for yourself or your own Private Group.
+6. Share compiled binaries of Kithos with members of your own Private Group, provided that the distribution is free of charge and remains non-commercial.
+
+These permissions apply only to the extent expressly stated in this License. No other rights are granted.
+
+## 3. Restrictions
+
+You may not, without prior written permission from the Copyright Holder:
+
+1. Redistribute, publish, mirror, or otherwise make the original Kithos source code available outside the official repository.
+2. Redistribute, publish, or share modified Kithos source code with third parties, whether publicly or privately.
+3. Sell, rent, lease, sublicense, or commercially exploit Kithos or any Modified Version.
+4. Charge users for access to Kithos or a service primarily based on Kithos.
+5. Introduce paid subscriptions, premium tiers, paid feature unlocks, paywalls, or other payment requirements for Kithos functionality.
+6. Monetize a Kithos-based service through advertising, sponsorships, paid access, or similar commercial arrangements.
+7. Offer Kithos or a Modified Version as a commercial hosting service, managed service, or paid communication platform.
+8. Grant third parties rights to Kithos beyond the permissions provided by this License.
+9. Remove, obscure, or alter copyright notices, attribution, or license information included with Kithos.
+10. Use Kithos to distribute malware, conduct unauthorized access, perform surveillance without authorization, harass others, or facilitate unlawful activities.
+
+These restrictions apply whether the original software is used, renamed, modified, rebranded, or incorporated into another product or service.
+
+## 4. Private Group Distribution
+
+You may distribute compiled binaries of Kithos or a Modified Version to members of your own Private Group, subject to all of the following conditions:
+
+1. Distribution must be free of charge.
+2. The group must remain private and invite-only.
+3. The distribution must not be used to generate revenue or provide a commercial service.
+4. The binaries must retain applicable copyright notices and include a copy of this License.
+5. Recipients must be informed of this License and agree to its terms before using the software.
+
+You may not publicly publish or distribute compiled binaries under this permission.
+
+You may not distribute original or modified source code to other people. Anyone wishing to modify Kithos must obtain the original source independently through the official repository and comply with this License.
+
+## 5. Commercial Use and Exceptions
+
+Any use outside the permissions expressly granted by this License requires prior written authorization from the Copyright Holder.
+
+This includes, without limitation:
+
+- Selling Kithos or a Modified Version.
+- Charging for access to Kithos or its functionality.
+- Offering paid subscriptions or premium features.
+- Operating a paid public hosting service based on Kithos.
+- Monetizing a Kithos-based product or service through advertising, sponsorships, or other revenue-generating arrangements.
+- Using Kithos as part of a commercial product or business.
+
+Paying for infrastructure, servers, hosting, domains, bandwidth, or other operational expenses does not by itself constitute Commercial Use, provided that:
+
+1. The software remains free for all members of the Private Group.
+2. No member is charged for access or functionality.
+3. The arrangement does not generate profit or provide a commercial service.
+
+Written authorization may be requested through the contact address in Section 11.
+
+## 6. Ownership and Modifications
+
+The original Kithos software, source code, branding, documentation, and other original materials remain the property of the Copyright Holder.
+
+This License does not transfer ownership of the original software or any of its intellectual property rights.
+
+You retain whatever rights you may have in original modifications you independently create, subject to the rights in the underlying Kithos materials and the restrictions of this License.
+
+Creating a Modified Version does not grant you additional rights to redistribute, publish, sublicense, sell, or commercially exploit the original Kithos materials.
+
+Contributions submitted to the official Kithos project may be subject to separate contribution terms.
+
+## 7. Third-Party Components
+
+Kithos may include, depend on, or integrate third-party software, libraries, frameworks, assets, or other components.
+
+Such components remain subject to their respective licenses and terms.
+
+This License applies only to original Kithos materials owned by the Copyright Holder. It does not replace, override, or restrict the rights granted by third-party licenses.
+
+Where required, applicable third-party copyright notices, license texts, attribution, and other notices must be preserved.
+
+A separate THIRD_PARTY_NOTICES file may identify these components and their applicable licenses.
+
+## 8. Disclaimer of Warranty
+
+Kithos is provided "AS IS" and "AS AVAILABLE", without warranties of any kind, whether express, implied, or statutory.
+
+The Copyright Holder does not guarantee that Kithos will be uninterrupted, secure, error-free, compatible with every system, or suitable for any particular purpose.
+
+To the maximum extent permitted by applicable law, the Copyright Holder shall not be liable for damages arising from the use, inability to use, modification, or distribution of Kithos.
+
+Nothing in this section excludes or limits liability that cannot legally be excluded or limited under applicable law.
+
+## 9. Termination
+
+Your permissions under this License automatically terminate if you materially violate its terms.
+
+Upon termination, you must stop using, distributing, and making available Kithos materials under the permissions granted by this License.
+
+Termination does not affect rights or obligations that accrued before termination, nor does it override mandatory rights provided by applicable law.
+
+## 10. Governing Law and Legal Rights
+
+This License shall be interpreted under the laws of Romania, subject to applicable mandatory provisions of European Union law and the mandatory consumer protections and jurisdictional rules that apply to the individual user.
+
+Nothing in this License is intended to remove or restrict rights that cannot legally be waived under applicable law.
+
+If any provision of this License is found invalid or unenforceable, the remaining provisions shall continue to apply to the extent permitted by law.
+
+## 11. Contact
+
+For commercial licensing requests, permissions, questions, or other licensing matters:
+
+**Email:** [barbsenseiu@proton.me](mailto:barbsenseiu@proton.me)
+
+**Project:** Kithos
+
+**License:** Kithos Personal Use License (KPUL) v1.0
+
+---
+
+END OF LICENSE

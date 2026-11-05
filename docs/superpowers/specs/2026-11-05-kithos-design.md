@@ -1,7 +1,7 @@
-# Hearth: private voice, video and text for a small friend group
+# Kithos: private voice, video and text for a small friend group
 
 Status: draft for review, 2026-11-05
-Working name: `hearth`. Rename freely; only the directory and crate names care.
+Project name: `kithos`. License: KPUL v1.0 (see `LICENSE`).
 
 ## 1. Problem
 
@@ -23,7 +23,7 @@ plus competent screen sharing. Chat is solved everywhere; media is not.
 - 5-15 users, all in the EU, no cross-region concerns.
 - Self-hosted on one small VPS, no vendor with access to plaintext messages.
 - Client RAM well under Discord's 400-800 MB, with no Electron.
-- Source-available under the author's PUL, private use allowed.
+- Source-available under KPUL v1.0, private use allowed.
 - Runs on Windows and Linux desktops.
 
 ## 3. Non-goals (v1)
@@ -268,19 +268,39 @@ shared server theme in v1.
 
 ## 11. Licensing
 
-The requested PUL is source-available, not open source. That is fine for a
-private tool, but two consequences need a decision:
+Kithos ships under the Kithos Personal Use License v1.0, verbatim in `LICENSE`.
+It is source-available and proprietary, not OSI open source, and the spec and
+README must say exactly that rather than "open source".
 
-1. Others cannot contribute under it. If contributions are ever wanted, MPL-2.0
-   is the closest permissive-ish fit.
-2. The text as written covers source redistribution, not compiled binaries.
-   Handing friends a build is ambiguous under it. Add an explicit clause
-   permitting distribution of binaries to named individuals, or the first time
-   you zip a release for a friend it is unclear whether you violated your own
-   license.
+Practical consequences that affect the design:
 
-Dependency licenses are compatible with private use: LiveKit Apache-2.0,
-Tauri MIT/Apache-2.0.
+1. **Public hosting of the source conflicts with the license.** GitHub's terms
+   grant every user the right to fork and reproduce public repository content
+   through the service. KPUL section 3.1 forbids making the source available
+   outside the official repository, so the two cannot both hold for a public
+   repo. Keep the repository private and grant access per person, or accept
+   that section 3.1 is decorative.
+2. **Binary distribution needs an acceptance step.** KPUL section 4.5 requires
+   recipients to be informed of and agree to the license before use. The client
+   needs a first-run screen that displays the license and records acceptance
+   locally, otherwise every build handed to a friend is out of compliance.
+3. **Package metadata.** No SPDX identifier exists for KPUL, so the Rust crates
+   use `license-file = "LICENSE"` rather than `license`, and SPDX-aware tooling
+   sees `LicenseRef-KPUL-1.0`.
+4. **Infrastructure costs are carved out.** KPUL section 5 states that paying
+   for servers and bandwidth is not Commercial Use. That matches the hosting
+   model in section 10 exactly, so renting the VPS is fine.
+
+**The GPL trap in the media path.** `libx264` is GPL-2.0. Linking it makes the
+distributed binary GPL, which overrides KPUL for the combined work and hands
+every recipient source rights, defeating section 3.2 outright. Build FFmpeg
+without `--enable-gpl` and without `--enable-libx264`, and encode through the
+hardware paths plus `openh264` (BSD-2-Clause) for the software fallback. This
+is a build-configuration decision, so it belongs in P0, not in cleanup.
+
+Otherwise the dependency set is compatible: LiveKit Apache-2.0, Tauri
+MIT/Apache-2.0, WebKitGTK LGPL-2.1 (dynamically linked). Third-party notices go
+in `THIRD_PARTY_NOTICES` as KPUL section 7 anticipates.
 
 ## 12. Risks
 
@@ -305,7 +325,8 @@ guilds and channels, message send and history pagination, WebSocket fan-out,
 uploads. Verified with integration tests against a temp database.
 
 **P2, client UI.** Chat view, history paging, theming, profile editing, avatars
-and banners. No media yet.
+and banners, and the first-run license acceptance screen required by KPUL
+section 4.5. No media yet.
 
 **P3, media integration.** Voice channels, join/leave, device selection,
 screen share toggle, remote video surface, mute and deafen.
