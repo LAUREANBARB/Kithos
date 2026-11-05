@@ -69,6 +69,22 @@ Build instructions will land with P0. Until then there is nothing to build.
 Codespaces and other headless containers cannot develop this project: the
 client needs a display, an audio device, a GPU and a real screen to capture.
 
+## Branching
+
+`main` is what the group actually runs. `nightly` is where changes land first.
+
+- Features, spikes and experiments go to `nightly`.
+- `nightly` merges into `main` only after real people have used it.
+- **Both branches must speak the same protocol.** A stable client talking to a
+  nightly server, and the reverse, is the normal situation for this group. A
+  breaking wire-format change is `main`-blocking, not a nightly privilege.
+- Nightly builds carry a version suffix such as `0.1.0-nightly.20261105`, so a
+  bug report identifies which build produced it.
+
+Without CI this is a naming convention, not a build pipeline. Actual nightly
+installers need a workflow running `tauri build` on Ubuntu and Windows runners
+and uploading artifacts.
+
 ## License
 
 Source-available under the **Kithos Personal Use License (KPUL) v1.0**. See
