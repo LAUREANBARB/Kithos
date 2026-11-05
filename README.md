@@ -77,7 +77,7 @@ Source-available under the **Kithos Personal Use License (KPUL) v1.0**. See
 This is **not** an open-source license and is not approved by the Open Source
 Initiative. You may read, modify and self-host Kithos for yourself or your own
 private group. You may not redistribute the source or commercially exploit it.
-Third-party components keep their own licenses; see `THIRD_PARTY_NOTICES` once
-it exists.
+Third-party components keep their own licenses; see
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
 Copyright (c) 2026 DVRKXN. All rights reserved.
