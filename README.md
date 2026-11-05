@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Kithos" width="160">
+</p>
+
 # Kithos
 
 Private voice, video and text for a small friend group.
