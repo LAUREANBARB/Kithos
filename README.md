@@ -8,8 +8,8 @@ that sounds fine, screen sharing that holds 1080p60, chat with durable
 searchable history, and a client whose theme, fonts, avatars and banners you
 actually control.
 
-**Status: pre-alpha. There is no code yet.** The design is in
-[`docs/superpowers/specs/2026-11-05-kithos-design.md`](docs/superpowers/specs/2026-11-05-kithos-design.md).
+**Status: pre-alpha. There is no code yet.** The design document is kept
+privately and is not part of this repository.
 
 ## Why
 
