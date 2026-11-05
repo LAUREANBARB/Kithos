@@ -17,6 +17,7 @@ For this License:
 - **Private Group** means a limited, invite-only group of individuals using Kithos for personal, non-commercial communication.
 - **Commercial Use** means using, distributing, hosting, modifying, or incorporating Kithos for a commercial purpose or to generate revenue, directly or indirectly.
 - **Modified Version** means a version of Kithos that has been changed, adapted, extended, or built upon.
+- **Official Repository** means the source code repository designated by the Copyright Holder as the canonical distribution point for Kithos.
 
 ## 2. Permission Grant
 
@@ -56,7 +57,7 @@ You may distribute compiled binaries of Kithos or a Modified Version to members 
 2. The group must remain private and invite-only.
 3. The distribution must not be used to generate revenue or provide a commercial service.
 4. The binaries must retain applicable copyright notices and include a copy of this License.
-5. Recipients must be informed of this License and agree to its terms before using the software.
+5. Recipients must be provided with a copy of this License.
 
 You may not publicly publish or distribute compiled binaries under this permission.
 

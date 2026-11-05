@@ -280,10 +280,10 @@ Practical consequences that affect the design:
    outside the official repository, so the two cannot both hold for a public
    repo. Keep the repository private and grant access per person, or accept
    that section 3.1 is decorative.
-2. **Binary distribution needs an acceptance step.** KPUL section 4.5 requires
-   recipients to be informed of and agree to the license before use. The client
-   needs a first-run screen that displays the license and records acceptance
-   locally, otherwise every build handed to a friend is out of compliance.
+2. **Binary distribution needs the license bundled.** KPUL section 4.4 requires
+   distributed binaries to include a copy of the license. The build packages
+   `LICENSE` as a client resource and the About screen renders it, so every
+   build handed to a friend is compliant without a separate acceptance flow.
 3. **Package metadata.** No SPDX identifier exists for KPUL, so the Rust crates
    use `license-file = "LICENSE"` rather than `license`, and SPDX-aware tooling
    sees `LicenseRef-KPUL-1.0`.
@@ -325,8 +325,8 @@ guilds and channels, message send and history pagination, WebSocket fan-out,
 uploads. Verified with integration tests against a temp database.
 
 **P2, client UI.** Chat view, history paging, theming, profile editing, avatars
-and banners, and the first-run license acceptance screen required by KPUL
-section 4.5. No media yet.
+and banners, and an About screen that renders the bundled `LICENSE`. No media
+yet.
 
 **P3, media integration.** Voice channels, join/leave, device selection,
 screen share toggle, remote video surface, mute and deafen.
