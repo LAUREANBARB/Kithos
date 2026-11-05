@@ -10,7 +10,11 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 anyhow = "1.0.104"
+ashpd = { version = "0.14.0", features = ["screencast"] }
 futures = "0.3.34"
+gstreamer = "0.25.4"
+gstreamer-app = "0.25.2"
+gstreamer-video = "0.25.4"
 livekit = "0.10.1"
 livekit-capture = { version = "0.1.9", features = ["source-pattern"] }
 livekit-token = "0.4.0"
